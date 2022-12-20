@@ -1,0 +1,45 @@
+#game-world{
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    background-color: aliceblue;
+    margin: 0%;
+    padding: 0%;
+}
+
+#enemy {
+    font-size: 2em;
+    background-color: wheat;
+    margin: 30px;
+    padding: 0.5em 4em;
+    position: fixed;
+    top: 0;
+    right: 0;
+}
+
+#ally {
+    font-size: 2em;
+    background-color: wheat;
+    margin: 30px;
+    padding: 0.5em 4em;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+}
+
+#moveset {
+    margin: 20px;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+}
+
+.move {
+    margin: 10px;
+    font-size: 2em;
+    width: 300px;
+    padding: 0.5em 1.5em;
+}
