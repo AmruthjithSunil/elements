@@ -48,4 +48,11 @@ for(let i=0; i<4; i++){
         enemy.hp -= 100;
         enemyHealthBar.textContent = `${enemy.hp}/400`;
     });
+    switch(ally.moves[i]){
+        case 'Fire': moves[i].style.backgroundColor = 'red';break;
+        case 'Aqua': moves[i].style.backgroundColor = 'lightblue';break;
+        case 'Earth': moves[i].style.backgroundColor = 'brown';break;
+        case 'Nature': moves[i].style.backgroundColor = 'green';break;
+        case 'Shock': moves[i].style.backgroundColor = 'yellow';break;
+    }
 }
