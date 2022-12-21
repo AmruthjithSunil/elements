@@ -20,21 +20,22 @@
     right: 0;
 }
 
-#ally {
+#ally{
     font-size: 2em;
     background-color: wheat;
     margin: 30px;
     padding: 0.5em 4em;
     position: fixed;
-    bottom: 0;
+    bottom: 50%;
     left: 0;
+    transform: translate(0,50%);
 }
 
 #moveset {
-    margin: 20px;
     position: fixed;
+    left: 50%;
     bottom: 0;
-    right: 0;
+    transform: translate(-50%,0);
 }
 
 .move {

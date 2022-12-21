@@ -61,6 +61,8 @@ for(let i=0; i<4; i++){
 
 function attack(e){
     enemy.currentHp -= (100 * stab(ally.types, e.path[0].textContent));
+    if(enemy.currentHp < 0)
+        enemy.currentHp = 0;
     enemyHealthBar.textContent = `${enemy.currentHp}/${enemy.totalHp}`;
 }
 
