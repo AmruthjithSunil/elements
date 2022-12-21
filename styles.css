@@ -11,20 +11,20 @@
 }
 
 #enemy {
-    font-size: 2em;
+    font-size: 32px;
     background-color: wheat;
     margin: 30px;
-    padding: 0.5em 4em;
+    padding: 8px 64px;
     position: fixed;
     top: 0;
     right: 0;
 }
 
 #ally{
-    font-size: 2em;
+    font-size: 32px;
     background-color: wheat;
     margin: 30px;
-    padding: 0.5em 4em;
+    padding: 8px 64px;
     position: fixed;
     bottom: 50%;
     left: 0;
@@ -37,22 +37,37 @@
 }
 
 .move {
-    margin: 10px 0;
-    font-size: 2em;
+    margin: 10px;
+    font-size: 32px;
     width: 300px;
-    padding: 0.5em 0em;
+    padding: 15px 0;
 }
 
-@media only screen and (max-width: 1207px){
+/*
+@media only screen and (max-height: 860px){
+    #moveset{
+        
+    }
+}
+*/
+
+@media only screen and (max-width: 1209px){
     #moveset{
         left: 50%;
         transform: translate(-150px,0);
     }
 }
 
-@media only screen and (min-width: 1208px){
+@media only screen and (min-width: 1209px){
+    #ally{
+        bottom: 0;
+        transform: translate(0,0);
+    }
     #moveset{
         right: 0;
-        margin: 20px 30px;
+        margin: 20px 20px;
+    }
+    .move{
+        padding: 15px 0;
     }
 }
