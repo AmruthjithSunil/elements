@@ -8,8 +8,9 @@ const typeNames = ['Fire', 'Aqua', 'Earth', 'Nature', 'Shock'];
 
 class Monster{
     constructor(){
-        this.hp = 400;
-        this.types = [typeNames[Math.floor(Math.random()*typeNames.length)], typeNames[Math.floor(Math.random()*typeNames.length)]];
+        this.totalHp = random(320,400);
+        this.currentHp = this.totalHp;
+        this.types = [typeNames[random(0,5)], typeNames[random(0,5)]];
         this.name = this.name();
         this.moves = this.randomMoves();
     }
@@ -34,20 +35,21 @@ class Monster{
     }
 }
 
+function random(min, max){
+    return Math.floor(Math.random()*(max-min)) + min;
+}
+
 const enemy = new Monster();
 const ally = new Monster();
 
 enemyName.textContent = enemy.name;
 allyName.textContent = ally.name;
-enemyHealthBar.textContent = `${enemy.hp}/400`;
-allyHealthBar.textContent = `${ally.hp}/400`;
+enemyHealthBar.textContent = `${enemy.currentHp}/${enemy.totalHp}`;
+allyHealthBar.textContent = `${ally.currentHp}/${ally.totalHp}`;
 
 for(let i=0; i<4; i++){
     moves[i].textContent = ally.moves[i];
-    moves[i].addEventListener('click', function attack(){
-        enemy.hp -= 100;
-        enemyHealthBar.textContent = `${enemy.hp}/400`;
-    });
+    moves[i].addEventListener('click', attack);
     switch(ally.moves[i]){
         case 'Fire': moves[i].style.backgroundColor = 'red';break;
         case 'Aqua': moves[i].style.backgroundColor = 'lightblue';break;
@@ -55,4 +57,23 @@ for(let i=0; i<4; i++){
         case 'Nature': moves[i].style.backgroundColor = 'green';break;
         case 'Shock': moves[i].style.backgroundColor = 'yellow';break;
     }
+}
+
+function attack(e){
+    enemy.currentHp -= (100 * stab(ally.types, e.path[0].textContent));
+    enemyHealthBar.textContent = `${enemy.currentHp}/${enemy.totalHp}`;
+}
+
+function stab(types, move){
+    if(types[0] == types[1]){
+        if(types[0] == move){
+            return 1.5;
+        }else{
+            return 1;
+        }
+    }
+    if(types[0] == move)
+        return 1.4;
+    if(types[1] == move)
+        return 1.3;
 }
