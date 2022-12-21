@@ -33,14 +33,26 @@
 
 #moveset {
     position: fixed;
-    left: 50%;
     bottom: 0;
-    transform: translate(-50%,0);
 }
 
 .move {
-    margin: 10px;
+    margin: 10px 0;
     font-size: 2em;
     width: 300px;
-    padding: 0.5em 1.5em;
+    padding: 0.5em 0em;
+}
+
+@media only screen and (max-width: 1207px){
+    #moveset{
+        left: 50%;
+        transform: translate(-150px,0);
+    }
+}
+
+@media only screen and (min-width: 1208px){
+    #moveset{
+        right: 0;
+        margin: 20px 30px;
+    }
 }
