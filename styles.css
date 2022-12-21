@@ -43,13 +43,14 @@
     padding: 15px 0;
 }
 
-/*
-@media only screen and (max-height: 860px){
-    #moveset{
-        
+@media only screen and (max-height: 900px){
+    .move{
+        font-size: 25px;
+    }
+    #ally, #enemy{
+        font-size: 25px;
     }
 }
-*/
 
 @media only screen and (max-width: 1209px){
     #moveset{
