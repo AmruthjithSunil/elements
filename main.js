@@ -10,7 +10,13 @@ class Monster{
     constructor(){
         this.hp = 400;
         this.types = [typeNames[Math.floor(Math.random()*typeNames.length)], typeNames[Math.floor(Math.random()*typeNames.length)]];
+        this.name = this.name();
         this.moves = this.randomMoves();
+    }
+    name(){
+        if(this.types[0] == this.types[1])
+            return `Pure ${this.types[0]}`;
+        return `${this.types[0]} ${this.types[1]}`;
     }
     randomMoves() {
         const moves = [];
@@ -31,8 +37,8 @@ class Monster{
 const enemy = new Monster();
 const ally = new Monster();
 
-enemyName.textContent = `${enemy.types[0]}-${enemy.types[1]}`;
-allyName.textContent = `${ally.types[0]}-${ally.types[1]}`;
+enemyName.textContent = enemy.name;
+allyName.textContent = ally.name;
 enemyHealthBar.textContent = `${enemy.hp}/400`;
 allyHealthBar.textContent = `${ally.hp}/400`;
 
