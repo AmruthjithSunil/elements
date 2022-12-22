@@ -11,7 +11,7 @@
 }
 
 #enemy {
-    font-size: 32px;
+    font-size: 25px;
     background-color: wheat;
     margin: 30px;
     padding: 8px 64px;
@@ -21,7 +21,7 @@
 }
 
 #ally{
-    font-size: 32px;
+    font-size: 25px;
     background-color: wheat;
     margin: 30px;
     padding: 8px 64px;
@@ -34,41 +34,33 @@
 #moveset {
     position: fixed;
     bottom: 0;
+    right: 0;   
 }
 
 .move {
     margin: 10px;
-    font-size: 32px;
-    width: 300px;
-    padding: 15px 0;
+    font-size: 25px;
+    width: 150px;
+    padding: 5px 0;
 }
 
-@media only screen and (max-height: 900px){
-    .move{
-        font-size: 25px;
-    }
-    #ally, #enemy{
-        font-size: 25px;
-    }
-}
-
-@media only screen and (max-width: 1209px){
-    #moveset{
-        left: 50%;
-        transform: translate(-150px,0);
-    }
-}
-
-@media only screen and (min-width: 1209px){
+@media only screen and (min-width: 1000px){
     #ally{
+        font-size: 32px;
         bottom: 0;
         transform: translate(0,0);
     }
+    #enemy{
+        font-size: 32px;
+    }
     #moveset{
         right: 0;
+        transform: translate(0, 0);
         margin: 20px 20px;
     }
     .move{
+        font-size: 32px;
+        width: 300px;
         padding: 15px 0;
     }
 }

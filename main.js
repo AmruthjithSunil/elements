@@ -6,6 +6,14 @@ const moves = document.getElementsByClassName('move');
 
 const typeNames = ['Fire', 'Aqua', 'Earth', 'Nature', 'Shock'];
 
+const typeChart = [
+    [0.5, 0.5, 1.0, 2.0, 1.0],
+    [2.0, 1.0, 1.0, 1.0, 1.0],
+    [1.0, 1.0, 1.0, 1.0, 1.0],
+    [1.0, 1.0, 1.0, 1.0, 1.0],
+    [1.0, 1.0, 1.0, 1.0, 1.0]
+]
+
 class Monster{
     constructor(){
         this.totalHp = random(320,400);
@@ -20,17 +28,15 @@ class Monster{
         return `${this.types[0]} ${this.types[1]}`;
     }
     randomMoves() {
-        const moves = [];
-        let f = 1;
-        for(let i=0; i<4; i++){
-            if(f && Math.random()>=0.8){
-                f=0;
-                continue;
+        const moves = [...typeNames];
+        do{
+            const t = random(0, typeNames.length);
+            if(typeNames[t] != this.types[0] && typeNames[t] != this.types[1]){
+                moves.splice(t, 1);
+                break;
             }
-            moves.push(typeNames[i]);
-        }
-        if(moves.length == 3)
-            moves.push(typeNames[4]);
+        }while(true);
+        console.log(moves);
         return moves;
     }
 }
@@ -68,11 +74,9 @@ function attack(e){
 
 function stab(types, move){
     if(types[0] == types[1]){
-        if(types[0] == move){
+        if(types[0] == move)
             return 1.5;
-        }else{
-            return 1;
-        }
+        return 1;
     }
     if(types[0] == move)
         return 1.4;
