@@ -8,10 +8,10 @@ const typeNames = ['Fire', 'Aqua', 'Earth', 'Nature', 'Shock'];
 
 const typeChart = [
     [0.5, 0.5, 1.0, 2.0, 1.0],
-    [2.0, 1.0, 1.0, 1.0, 1.0],
-    [1.0, 1.0, 1.0, 1.0, 1.0],
-    [1.0, 1.0, 1.0, 1.0, 1.0],
-    [1.0, 1.0, 1.0, 1.0, 1.0]
+    [2.0, 0.5, 2.0, 0.5, 1.0],
+    [2.0, 1.0, 1.0, 0.5, 2.0],
+    [0.5, 2.0, 2.0, 0.5, 1.0],
+    [1.0, 2.0, 0.0, 0.5, 0.5]
 ]
 
 class Monster{
@@ -36,7 +36,6 @@ class Monster{
                 break;
             }
         }while(true);
-        console.log(moves);
         return moves;
     }
 }
@@ -66,21 +65,29 @@ for(let i=0; i<4; i++){
 }
 
 function attack(e){
-    enemy.currentHp -= (100 * stab(ally.types, e.path[0].textContent));
+    enemy.currentHp -= (100 * stab(ally.types, e.path[0].textContent) * effectiveness(enemy.types, e.path[0].textContent));
+    console.log(effectiveness(enemy.types, e.path[0].textContent));
     if(enemy.currentHp < 0)
         enemy.currentHp = 0;
     enemyHealthBar.textContent = `${enemy.currentHp}/${enemy.totalHp}`;
 }
 
-function stab(types, move){
-    if(types[0] == types[1]){
-        if(types[0] == move)
+function stab(allyTypes, move){
+    if(allyTypes[0] == allyTypes[1]){
+        if(allyTypes[0] == move)
             return 1.5;
         return 1;
     }
-    if(types[0] == move)
+    if(allyTypes[0] == move)
         return 1.4;
-    if(types[1] == move)
+    if(allyTypes[1] == move)
         return 1.3;
     return 1;
+}
+
+function effectiveness(enemyTypes, move){
+    if(enemyTypes[0] == enemyTypes[1]){
+        return(typeChart[typeNames.indexOf(move)][typeNames.indexOf(enemyTypes[0])]);
+    }
+    return(typeChart[typeNames.indexOf(move)][typeNames.indexOf(enemyTypes[0])] * typeChart[typeNames.indexOf(move)][typeNames.indexOf(enemyTypes[1])]);
 }
