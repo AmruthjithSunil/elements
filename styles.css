@@ -38,6 +38,7 @@
 }
 
 .move {
+    border-radius: 10px;
     margin: 10px;
     font-size: 25px;
     width: 150px;
