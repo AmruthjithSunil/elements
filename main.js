@@ -3,6 +3,7 @@ const allyHealthBar = document.getElementById('ally-health');
 const enemyName = document.getElementById('enemy-name');
 const allyName = document.getElementById('ally-name');
 const moves = document.getElementsByClassName('move');
+const log = document.getElementById('log');
 
 const typeNames = ['Fire', 'Aqua', 'Earth', 'Nature', 'Shock'];
 
@@ -16,7 +17,7 @@ const typeChart = [
 
 class Monster{
     constructor(){
-        this.totalHp = random(320,400);
+        this.totalHp = random(360,600);
         this.currentHp = this.totalHp;
         this.types = [typeNames[random(0,5)], typeNames[random(0,5)]];
         this.name = this.name();
@@ -24,8 +25,8 @@ class Monster{
     }
     name(){
         if(this.types[0] == this.types[1])
-            return `Pure ${this.types[0]}`;
-        return `${this.types[0]} ${this.types[1]}`;
+            return `Pure-${this.types[0]}`;
+        return `${this.types[0]}-${this.types[1]}`;
     }
     randomMoves() {
         const moves = [...typeNames];
@@ -65,11 +66,18 @@ for(let i=0; i<4; i++){
 }
 
 function attack(e){
-    enemy.currentHp -= (100 * stab(ally.types, e.path[0].textContent) * effectiveness(enemy.types, e.path[0].textContent));
-    console.log(effectiveness(enemy.types, e.path[0].textContent));
+    const damage = (100 * stab(ally.types, e.path[0].textContent) * effectiveness(enemy.types, e.path[0].textContent));
+    enemy.currentHp -= damage;
     if(enemy.currentHp < 0)
         enemy.currentHp = 0;
     enemyHealthBar.textContent = `${enemy.currentHp}/${enemy.totalHp}`;
+    log.textContent = `Enemy ${enemy.name} dealt ${damage} damage from ally ${ally.name}'s ${e.path[0].textContent} attack. `;
+    if(effectiveness(enemy.types, e.path[0].textContent)>1){
+        log.textContent += 'Super Effective';
+    }
+    if(effectiveness(enemy.types, e.path[0].textContent)<1){
+        log.textContent += 'Not Very Effective';
+    }
 }
 
 function stab(allyTypes, move){
