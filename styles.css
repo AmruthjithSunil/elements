@@ -5,14 +5,16 @@
     display: flex;
     width: 100vw;
     height: 100vh;
-    background-color: aliceblue;
+    background-color: lavender;
     margin: 0%;
     padding: 0%;
 }
 
 #enemy, #ally{
+    border-radius: 30px;
     font-size: 25px;
-    background-color: wheat;
+    background-color: teal;
+    color: lavender;
     margin: 30px;
     padding: 5px 0;
     width: 250px;
@@ -47,11 +49,13 @@
 
 @media only screen and (min-width: 1000px){
     #ally{
+        width: 300px;
         font-size: 32px;
         bottom: 0;
         transform: translate(0,0);
     }
     #enemy{
+        width: 300px;
         font-size: 32px;
     }
     #moveset{
