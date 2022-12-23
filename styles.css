@@ -10,22 +10,22 @@
     padding: 0%;
 }
 
-#enemy {
+#enemy, #ally{
     font-size: 25px;
     background-color: wheat;
     margin: 30px;
-    margin-top: 70px;
-    padding: 8px 64px;
+    padding: 5px 0;
+    width: 250px;
+    text-align: center;
     position: fixed;
+}
+
+#enemy {
+    margin-top: 80px;
     right: 0;
 }
 
 #ally{
-    font-size: 25px;
-    background-color: wheat;
-    margin: 30px;
-    padding: 8px 64px;
-    position: fixed;
     bottom: 40%;
     left: 0;
     transform: translate(0,50%);

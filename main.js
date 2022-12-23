@@ -21,13 +21,14 @@ class Monster{
         this.currentHp = this.totalHp;
         this.speed = random(average-20, average+20)
         this.types = [typeNames[random(0,5)], typeNames[random(0,5)]];
+        this.average = Math.round(((this.totalHp)/6+this.speed)/2);
         this.name = this.name();
         this.moves = this.randomMoves();
     }
     name(){
         if(this.types[0] == this.types[1])
-            return `Pure-${this.types[0]}`;
-        return `${this.types[0]}-${this.types[1]}`;
+            return `Pure${this.types[0]}${this.average}`;
+        return `${this.types[0]}${this.types[1]}${this.average}`;
     }
     randomMoves() {
         const moves = [...typeNames];
@@ -48,7 +49,6 @@ function random(min, max){
 
 const enemy = new Monster();
 const ally = new Monster();
-console.log(enemy.moves);
 
 enemyName.textContent = enemy.name;
 allyName.textContent = ally.name;
