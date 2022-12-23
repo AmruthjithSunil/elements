@@ -16,9 +16,10 @@ const typeChart = [
 ]
 
 class Monster{
-    constructor(){
-        this.totalHp = random(360,600);
+    constructor(average = 80){
+        this.totalHp = random((average-20)*6,(average+20)*6);
         this.currentHp = this.totalHp;
+        this.speed = random(average-20, average+20)
         this.types = [typeNames[random(0,5)], typeNames[random(0,5)]];
         this.name = this.name();
         this.moves = this.randomMoves();
@@ -47,11 +48,12 @@ function random(min, max){
 
 const enemy = new Monster();
 const ally = new Monster();
+console.log(enemy.moves);
 
 enemyName.textContent = enemy.name;
 allyName.textContent = ally.name;
-enemyHealthBar.textContent = `${enemy.currentHp}/${enemy.totalHp}`;
-allyHealthBar.textContent = `${ally.currentHp}/${ally.totalHp}`;
+enemyHealthBar.textContent = `Hp:${enemy.currentHp}/${enemy.totalHp} Sp:${enemy.speed}`;
+allyHealthBar.textContent = `Hp:${ally.currentHp}/${ally.totalHp} Sp:${ally.speed}`;
 
 for(let i=0; i<4; i++){
     moves[i].textContent = ally.moves[i];
@@ -66,18 +68,60 @@ for(let i=0; i<4; i++){
 }
 
 function attack(e){
-    const damage = (100 * stab(ally.types, e.path[0].textContent) * effectiveness(enemy.types, e.path[0].textContent));
-    enemy.currentHp -= damage;
-    if(enemy.currentHp < 0)
-        enemy.currentHp = 0;
-    enemyHealthBar.textContent = `${enemy.currentHp}/${enemy.totalHp}`;
-    log.textContent = `Enemy ${enemy.name} dealt ${damage} damage from ally ${ally.name}'s ${e.path[0].textContent} attack. `;
-    if(effectiveness(enemy.types, e.path[0].textContent)>1){
-        log.textContent += 'Super Effective';
+    log.innerHTML = '';
+    if(ally.speed>enemy.speed){
+        log.innerHTML += attackFn(ally, enemy, e.path[0].textContent);
+        log.innerHTML += '<br>'
+        if(enemy.currentHp == 0){
+            log.innerHTML += 'You won';
+            enemyHealthBar.textContent = `Hp:${enemy.currentHp}/${enemy.totalHp} Sp:${enemy.speed}`;
+            allyHealthBar.textContent = `Hp:${ally.currentHp}/${ally.totalHp} Sp:${ally.speed}`;
+            return;
+        }
+        log.innerHTML += attackFn(enemy, ally, enemy.moves[random(0,4)]);
+        if(ally.currentHp == 0){
+            log.innerHTML += '<br>You lost';
+            enemyHealthBar.textContent = `Hp:${enemy.currentHp}/${enemy.totalHp} Sp:${enemy.speed}`;
+            allyHealthBar.textContent = `Hp:${ally.currentHp}/${ally.totalHp} Sp:${ally.speed}`;
+            return;
+        }
+    }else{
+        log.innerHTML += attackFn(enemy, ally, enemy.moves[random(0,4)]);
+        if(ally.currentHp == 0){
+            log.innerHTML += '<br>You lost';
+            enemyHealthBar.textContent = `Hp:${enemy.currentHp}/${enemy.totalHp} Sp:${enemy.speed}`;
+            allyHealthBar.textContent = `Hp:${ally.currentHp}/${ally.totalHp} Sp:${ally.speed}`;
+            return;
+        }
+        log.innerHTML += '<br>'
+        log.innerHTML += attackFn(ally, enemy, e.path[0].textContent);
+        if(enemy.currentHp == 0){
+            log.innerHTML += '<br>You won';
+        }
     }
-    if(effectiveness(enemy.types, e.path[0].textContent)<1){
-        log.textContent += 'Not Very Effective';
+    enemyHealthBar.textContent = `Hp:${enemy.currentHp}/${enemy.totalHp} Sp:${enemy.speed}`;
+    allyHealthBar.textContent = `Hp:${ally.currentHp}/${ally.totalHp} Sp:${ally.speed}`;
+}
+
+function attackFn(attacker, defender, move){
+    if(attacker.currentHp == 0)
+        return "Dead guy can't attack";
+    let damage = (100 * stab(attacker.types, move) * effectiveness(defender.types, move));
+    let log = '';
+    defender.currentHp -= damage;
+    if(defender.currentHp < 0)
+        defender.currentHp = 0;
+    if(attacker === ally)
+        log += `Your ${ally.name} used ${move}(-${damage}). `;
+    else
+        log += `Enemy ${enemy.name} used ${move}(-${damage}). `;;
+    if(effectiveness(defender.types, move)>1){
+        log += 'Super Effective. ';
     }
+    if(effectiveness(defender.types, move)<1){
+        log += 'Not Very Effective. ';
+    }
+    return log;
 }
 
 function stab(allyTypes, move){
