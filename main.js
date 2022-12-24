@@ -21,7 +21,7 @@ class Monster{
         this.currentHp = this.totalHp;
         this.speed = random(average-20, average+20)
         this.types = [typeNames[random(0,5)], typeNames[random(0,5)]];
-        this.average = Math.round(((this.totalHp)/6+this.speed)/2);
+        this.average = Math.round(((this.totalHp)/12+this.speed)/2);
         this.name = this.name();
         this.moves = this.randomMoves();
     }

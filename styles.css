@@ -2,7 +2,6 @@
     position: fixed;
     top: 0;
     left: 0;
-    display: flex;
     width: 100vw;
     height: 100vh;
     background-color: lavender;
@@ -10,33 +9,35 @@
     padding: 0%;
 }
 
+#log{
+    width: 100%;
+    height: 80px;
+    text-align: center;
+    background-color: aliceblue ;
+}
+
 #enemy, #ally{
     border-radius: 30px;
     font-size: 25px;
     background-color: teal;
     color: lavender;
-    margin: 30px;
+    margin: 10px;
     padding: 5px 0;
     width: 250px;
     text-align: center;
-    position: fixed;
 }
 
 #enemy {
-    margin-top: 80px;
-    right: 0;
+    float: right;
 }
 
-#ally{
-    bottom: 40%;
-    left: 0;
-    transform: translate(0,50%);
+#ally {
+    clear: right;
+    float: left;
 }
 
 #moveset {
-    position: fixed;
-    bottom: 10%;
-    right: 0;   
+    float: right;  
 }
 
 .move {
@@ -48,20 +49,14 @@
 }
 
 @media only screen and (min-width: 1000px){
-    #ally{
+    #enemy, #ally{
         width: 300px;
         font-size: 32px;
-        bottom: 0;
+    }
+    #ally{
         transform: translate(0,0);
     }
-    #enemy{
-        width: 300px;
-        font-size: 32px;
-    }
     #moveset{
-        right: 0;
-        bottom: 0;
-        transform: translate(0, 0);
         margin: 20px 20px;
     }
     .move{
