@@ -19,9 +19,11 @@ class Monster{
     constructor(average = 80){
         this.totalHp = random((average-10)*12,(average+10)*12);
         this.currentHp = this.totalHp;
-        this.speed = random(average-20, average+20)
+        this.speed = random(average-20, average+20);
         this.types = [typeNames[random(0,5)], typeNames[random(0,5)]];
-        this.average = Math.round(((this.totalHp)/12+this.speed)/2);
+        this.attack = [random(average-20, average+20), random(average-20, average+20)];
+        this.defence = [random(average-20, average+20), random(average-20, average+20)];
+        this.average = Math.round(((this.totalHp)/12+ this.speed + (this.attack[0]+this.attack[1])/2 + (this.defence[0]+this.defence[1])/2)/4);
         this.name = this.name();
         this.moves = this.randomMoves();
     }
@@ -52,8 +54,14 @@ const ally = new Monster();
 
 enemyName.textContent = enemy.name;
 allyName.textContent = ally.name;
-enemyHealthBar.textContent = `Hp:${enemy.currentHp}/${enemy.totalHp} Sp:${enemy.speed}`;
-allyHealthBar.textContent = `Hp:${ally.currentHp}/${ally.totalHp} Sp:${ally.speed}`;
+enemyHealthBar.innerHTML = healthBar(enemy);
+allyHealthBar.innerHTML = healthBar(ally);
+
+function healthBar(monster){
+    return `Hp:${monster.currentHp}/${monster.totalHp} Sp:${monster.speed}
+            <br>Atk:${monster.attack[0]} Sp.Atk:${monster.attack[1]}
+            <br>Df:${monster.defence[0]} Sp.Df:${monster.defence[1]}`;
+}
 
 for(let i=0; i<4; i++){
     moves[i].textContent = ally.moves[i];
@@ -74,23 +82,23 @@ function attack(e){
         log.innerHTML += '<br>'
         if(enemy.currentHp == 0){
             log.innerHTML += 'You won';
-            enemyHealthBar.textContent = `Hp:${enemy.currentHp}/${enemy.totalHp} Sp:${enemy.speed}`;
-            allyHealthBar.textContent = `Hp:${ally.currentHp}/${ally.totalHp} Sp:${ally.speed}`;
+            enemyHealthBar.innerHTML = healthBar(enemy);
+            allyHealthBar.innerHTML = healthBar(ally);
             return;
         }
         log.innerHTML += attackFn(enemy, ally, enemy.moves[random(0,4)]);
         if(ally.currentHp == 0){
             log.innerHTML += '<br>You lost';
-            enemyHealthBar.textContent = `Hp:${enemy.currentHp}/${enemy.totalHp} Sp:${enemy.speed}`;
-            allyHealthBar.textContent = `Hp:${ally.currentHp}/${ally.totalHp} Sp:${ally.speed}`;
+            enemyHealthBar.innerHTML = healthBar(enemy);
+            allyHealthBar.innerHTML = healthBar(ally);
             return;
         }
     }else{
         log.innerHTML += attackFn(enemy, ally, enemy.moves[random(0,4)]);
         if(ally.currentHp == 0){
             log.innerHTML += '<br>You lost';
-            enemyHealthBar.textContent = `Hp:${enemy.currentHp}/${enemy.totalHp} Sp:${enemy.speed}`;
-            allyHealthBar.textContent = `Hp:${ally.currentHp}/${ally.totalHp} Sp:${ally.speed}`;
+            enemyHealthBar.innerHTML = healthBar(enemy);
+            allyHealthBar.innerHTML = healthBar(ally);
             return;
         }
         log.innerHTML += '<br>'
@@ -99,8 +107,8 @@ function attack(e){
             log.innerHTML += '<br>You won';
         }
     }
-    enemyHealthBar.textContent = `Hp:${enemy.currentHp}/${enemy.totalHp} Sp:${enemy.speed}`;
-    allyHealthBar.textContent = `Hp:${ally.currentHp}/${ally.totalHp} Sp:${ally.speed}`;
+    enemyHealthBar.innerHTML = healthBar(enemy);
+    allyHealthBar.innerHTML = healthBar(ally);
 }
 
 function attackFn(attacker, defender, move){
