@@ -17,7 +17,7 @@ const typeChart = [
 
 class Monster{
     constructor(average = 80){
-        this.totalHp = random((average-20)*6,(average+20)*6);
+        this.totalHp = random((average-20)*12,(average+20)*12);
         this.currentHp = this.totalHp;
         this.speed = random(average-20, average+20)
         this.types = [typeNames[random(0,5)], typeNames[random(0,5)]];
