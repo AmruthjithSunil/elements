@@ -53,9 +53,6 @@
         width: 300px;
         font-size: 32px;
     }
-    #ally{
-        transform: translate(0,0);
-    }
     #moveset{
         margin: 20px 20px;
     }

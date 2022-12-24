@@ -6,6 +6,8 @@ const moves = document.getElementsByClassName('move');
 const log = document.getElementById('log');
 
 const typeNames = ['Fire', 'Aqua', 'Earth', 'Nature', 'Shock'];
+const moveNames = ['Fire0', 'Aqua0', 'Earth0', 'Nature0', 'Shock0',
+                   'Fire1', 'Aqua1', 'Earth1', 'Nature1', 'Shock1']
 
 const typeChart = [
     [0.5, 0.5, 1.0, 2.0, 1.0],
@@ -33,20 +35,33 @@ class Monster{
         return `${this.types[0]}${this.types[1]}${this.average}`;
     }
     randomMoves() {
-        const moves = [...typeNames];
-        do{
-            const t = random(0, typeNames.length);
-            if(typeNames[t] != this.types[0] && typeNames[t] != this.types[1]){
-                moves.splice(t, 1);
-                break;
-            }
-        }while(true);
+        const moves = [`${this.types[0]}0`, `${this.types[0]}1`];
+        if(this.types[0] != this.types[1]){
+            moves.push(`${this.types[1]}${random(0,2)}`);
+            moves.push(moveNames[random(0, 10, [moveNames.indexOf(moves[0]), moveNames.indexOf(moves[1]), moveNames.indexOf(moves[2])])])
+        }else{
+            moves.push(moveNames[random(0, 10, [moveNames.indexOf(moves[0]), moveNames.indexOf(moves[1])])])
+            moves.push(moveNames[random(0, 10, [moveNames.indexOf(moves[0]), moveNames.indexOf(moves[1]), moveNames.indexOf(moves[2])])])
+        }
         return moves;
     }
 }
 
-function random(min, max){
-    return Math.floor(Math.random()*(max-min)) + min;
+function random(min, max, arr = []){
+    let f;
+    let length = arr.length;
+    let ret;
+    do{
+        f=0;
+        ret = Math.floor(Math.random()*(max-min)) + min;
+        for(let i=0; i<length; i++){
+            if(ret === arr[i]){
+                f=1;
+                i=length;
+            }
+        }
+    }while(f)
+    return ret;
 }
 
 const enemy = new Monster();
@@ -66,7 +81,7 @@ function healthBar(monster){
 for(let i=0; i<4; i++){
     moves[i].textContent = ally.moves[i];
     moves[i].addEventListener('click', attack);
-    switch(ally.moves[i]){
+    switch(ally.moves[i].slice(0,-1)){
         case 'Fire': moves[i].style.backgroundColor = 'coral';break;
         case 'Aqua': moves[i].style.backgroundColor = 'lightblue';break;
         case 'Earth': moves[i].style.backgroundColor = 'burlywood';break;
@@ -114,8 +129,13 @@ function attack(e){
 function attackFn(attacker, defender, move){
     if(attacker.currentHp == 0)
         return "Dead guy can't attack";
-    let damage = (100 * stab(attacker.types, move) * effectiveness(defender.types, move));
+    let damage = (100 * stab(attacker.types, move.slice(0, -1)) * effectiveness(defender.types, move.slice(0, -1)));
     let log = '';
+    if(move[move.length-1] == '0'){
+        damage = Math.round(damage*attacker.attack[0]/defender.defence[0]);
+    }else{
+        damage = Math.round(damage*attacker.attack[1]/defender.defence[1]);
+    }
     defender.currentHp -= damage;
     if(defender.currentHp < 0)
         defender.currentHp = 0;
@@ -123,10 +143,10 @@ function attackFn(attacker, defender, move){
         log += `Your ${ally.name} used ${move}(-${damage}). `;
     else
         log += `Enemy ${enemy.name} used ${move}(-${damage}). `;;
-    if(effectiveness(defender.types, move)>1){
+    if(effectiveness(defender.types, move.slice(0, -1))>1){
         log += 'Super Effective. ';
     }
-    if(effectiveness(defender.types, move)<1){
+    if(effectiveness(defender.types, move.slice(0, -1))<1){
         log += 'Not Very Effective. ';
     }
     return log;
