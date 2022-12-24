@@ -59,11 +59,11 @@ for(let i=0; i<4; i++){
     moves[i].textContent = ally.moves[i];
     moves[i].addEventListener('click', attack);
     switch(ally.moves[i]){
-        case 'Fire': moves[i].style.backgroundColor = 'red';break;
+        case 'Fire': moves[i].style.backgroundColor = 'coral';break;
         case 'Aqua': moves[i].style.backgroundColor = 'lightblue';break;
         case 'Earth': moves[i].style.backgroundColor = 'burlywood';break;
         case 'Nature': moves[i].style.backgroundColor = 'lightgreen';break;
-        case 'Shock': moves[i].style.backgroundColor = 'yellow';break;
+        case 'Shock': moves[i].style.backgroundColor = 'gold';break;
     }
 }
 
