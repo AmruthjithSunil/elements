@@ -19,12 +19,14 @@ const typeChart = [
 
 class Monster{
     constructor(average = 80){
-        this.totalHp = random((average-10)*12,(average+10)*12);
+        this.totalHp = random((average-10)*9,(average+10)*9);
         this.currentHp = this.totalHp;
         this.speed = random(average-20, average+20);
         this.types = [typeNames[random(0,5)], typeNames[random(0,5)]];
         this.attack = [random(average-20, average+20), random(average-20, average+20)];
         this.defence = [random(average-20, average+20), random(average-20, average+20)];
+        this.stamina = 100;
+        this.energy = 100;
         this.average = Math.round(((this.totalHp)/12+ this.speed + (this.attack[0]+this.attack[1])/2 + (this.defence[0]+this.defence[1])/2)/4);
         this.name = this.name();
         this.moves = this.randomMoves();
@@ -72,7 +74,9 @@ enemyHealthBar.innerHTML = statsBar(enemy);
 allyHealthBar.innerHTML = statsBar(ally);
 
 function statsBar(monster){
-    return `Hp:${monster.currentHp}/${monster.totalHp} Sp:${monster.speed}
+    return  `Stamina : ${monster.stamina}
+            <br>Energy : ${monster.energy}
+            <br>Hp:${monster.currentHp}/${monster.totalHp} Sp:${monster.speed}
             <br>Atk:${monster.attack[0]} Sp.Atk:${monster.attack[1]}
             <br>Df:${monster.defence[0]} Sp.Df:${monster.defence[1]}`;
 }
@@ -136,6 +140,9 @@ function attack(e){
             log.innerHTML += '<br>You won';
         }
     }
+    for(let i=0; i<4; i++)
+        moves[i].style.color = 'black';
+    moves[strongest(ally, enemy)].style.color = 'white';
     enemyHealthBar.innerHTML = statsBar(enemy);
     allyHealthBar.innerHTML = statsBar(ally);
 }
@@ -145,7 +152,14 @@ function attackFn(attacker, defender, move){
         return "Dead guy can't attack";
     let log = '';
     let damage = damageDealt(attacker, defender, move);
+    if(move[move.length-1] == '0'){
+        attacker.stamina = Math.round(attacker.stamina/2);
+    }
+    if(move[move.length-1] == '1'){
+        attacker.energy = Math.round(attacker.energy/2);
+    }
     defender.currentHp -= damage;
+    increment(attacker);
     if(defender.currentHp < 0)
         defender.currentHp = 0;
     if(attacker === ally)
@@ -161,12 +175,21 @@ function attackFn(attacker, defender, move){
     return log;
 }
 
+function increment(attacker){
+    attacker.stamina += 20;
+    attacker.energy += 20;
+    if(attacker.stamina > 100)
+        attacker.stamina = 100;
+    if(attacker.energy > 100)
+        attacker.energy = 100;
+}
+
 function damageDealt(attacker, defender, move){
     let damage = (100 * stab(attacker.types, move.slice(0, -1)) * effectiveness(defender.types, move.slice(0, -1)));
     if(move[move.length-1] == '0'){
-        damage = Math.round(damage*attacker.attack[0]/defender.defence[0]);
+        damage = Math.round(damage*attacker.attack[0]/defender.defence[0]*attacker.stamina/100);
     }else{
-        damage = Math.round(damage*attacker.attack[1]/defender.defence[1]);
+        damage = Math.round(damage*attacker.attack[1]/defender.defence[1]*attacker.energy/100);
     }
     return damage;
 }
@@ -189,6 +212,8 @@ function effectiveness(enemyTypes, move){
     if(enemyTypes[0] == enemyTypes[1]){
         return effect;
     }
-    effect *= typeChart[typeNames.indexOf(move)][typeNames.indexOf(enemyTypes[1])];
+    effect = (effect + typeChart[typeNames.indexOf(move)][typeNames.indexOf(enemyTypes[1])])/2;
+    if(effect == 1.25)
+        return 1;
     return effect;
 }
