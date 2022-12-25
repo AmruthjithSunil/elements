@@ -38,30 +38,29 @@ class Monster{
         const moves = [`${this.types[0]}0`, `${this.types[0]}1`];
         if(this.types[0] != this.types[1]){
             moves.push(`${this.types[1]}${random(0,2)}`);
-            moves.push(moveNames[random(0, 10, [moveNames.indexOf(moves[0]), moveNames.indexOf(moves[1]), moveNames.indexOf(moves[2])])])
-        }else{
-            moves.push(moveNames[random(0, 10, [moveNames.indexOf(moves[0]), moveNames.indexOf(moves[1])])])
-            moves.push(moveNames[random(0, 10, [moveNames.indexOf(moves[0]), moveNames.indexOf(moves[1]), moveNames.indexOf(moves[2])])])
+            const movesIndex = [moveNames.indexOf(moves[0]), moveNames.indexOf(moves[1]), moveNames.indexOf(moves[2])];
+            moves.push(moveNames[random(0, 10, movesIndex)]);
+            return moves;
         }
+        const movesIndex = [moveNames.indexOf(moves[0]), moveNames.indexOf(moves[1])];
+        moves.push(moveNames[random(0, 10, movesIndex)]);
+        movesIndex.push(moveNames.indexOf(moves[2]));
+        moves.push(moveNames[random(0, 10, movesIndex)]);        
         return moves;
     }
 }
 
 function random(min, max, arr = []){
-    let f;
     let length = arr.length;
-    let ret;
-    do{
-        f=0;
-        ret = Math.floor(Math.random()*(max-min)) + min;
-        for(let i=0; i<length; i++){
-            if(ret === arr[i]){
-                f=1;
-                i=length;
-            }
-        }
-    }while(f)
-    return ret;
+    if(length == 0)
+        return Math.floor(Math.random()*(max-min)) + min;
+    let pass = Math.floor(Math.random()*(max-min-length));
+    for(let i=min; i<max; i++){
+        if(arr.indexOf(i) == -1)
+            pass--;
+        if(pass == -1)
+            return i;
+    }
 }
 
 const enemy = new Monster();
@@ -69,10 +68,10 @@ const ally = new Monster();
 
 enemyName.textContent = enemy.name;
 allyName.textContent = ally.name;
-enemyHealthBar.innerHTML = healthBar(enemy);
-allyHealthBar.innerHTML = healthBar(ally);
+enemyHealthBar.innerHTML = statsBar(enemy);
+allyHealthBar.innerHTML = statsBar(ally);
 
-function healthBar(monster){
+function statsBar(monster){
     return `Hp:${monster.currentHp}/${monster.totalHp} Sp:${monster.speed}
             <br>Atk:${monster.attack[0]} Sp.Atk:${monster.attack[1]}
             <br>Df:${monster.defence[0]} Sp.Df:${monster.defence[1]}`;
@@ -97,23 +96,23 @@ function attack(e){
         log.innerHTML += '<br>'
         if(enemy.currentHp == 0){
             log.innerHTML += 'You won';
-            enemyHealthBar.innerHTML = healthBar(enemy);
-            allyHealthBar.innerHTML = healthBar(ally);
+            enemyHealthBar.innerHTML = statsBar(enemy);
+            allyHealthBar.innerHTML = statsBar(ally);
             return;
         }
         log.innerHTML += attackFn(enemy, ally, enemy.moves[random(0,4)]);
         if(ally.currentHp == 0){
             log.innerHTML += '<br>You lost';
-            enemyHealthBar.innerHTML = healthBar(enemy);
-            allyHealthBar.innerHTML = healthBar(ally);
+            enemyHealthBar.innerHTML = statsBar(enemy);
+            allyHealthBar.innerHTML = statsBar(ally);
             return;
         }
     }else{
         log.innerHTML += attackFn(enemy, ally, enemy.moves[random(0,4)]);
         if(ally.currentHp == 0){
             log.innerHTML += '<br>You lost';
-            enemyHealthBar.innerHTML = healthBar(enemy);
-            allyHealthBar.innerHTML = healthBar(ally);
+            enemyHealthBar.innerHTML = statsBar(enemy);
+            allyHealthBar.innerHTML = statsBar(ally);
             return;
         }
         log.innerHTML += '<br>'
@@ -122,8 +121,8 @@ function attack(e){
             log.innerHTML += '<br>You won';
         }
     }
-    enemyHealthBar.innerHTML = healthBar(enemy);
-    allyHealthBar.innerHTML = healthBar(ally);
+    enemyHealthBar.innerHTML = statsBar(enemy);
+    allyHealthBar.innerHTML = statsBar(ally);
 }
 
 function attackFn(attacker, defender, move){
@@ -166,8 +165,10 @@ function stab(allyTypes, move){
 }
 
 function effectiveness(enemyTypes, move){
+    let effect = typeChart[typeNames.indexOf(move)][typeNames.indexOf(enemyTypes[0])];
     if(enemyTypes[0] == enemyTypes[1]){
-        return(typeChart[typeNames.indexOf(move)][typeNames.indexOf(enemyTypes[0])]);
+        return effect;
     }
-    return(typeChart[typeNames.indexOf(move)][typeNames.indexOf(enemyTypes[0])] * typeChart[typeNames.indexOf(move)][typeNames.indexOf(enemyTypes[1])]);
+    effect *= typeChart[typeNames.indexOf(move)][typeNames.indexOf(enemyTypes[1])];
+    return effect;
 }
