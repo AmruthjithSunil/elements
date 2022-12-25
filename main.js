@@ -89,6 +89,21 @@ for(let i=0; i<4; i++){
     }
 }
 
+moves[strongest(ally, enemy)].style.color = 'white';
+
+function strongest(attacker, defender){
+    let index = 0;
+    let strong = damageDealt(attacker, defender, attacker.moves[index]);
+    for(let i=1; i<4; i++){
+        let temp = damageDealt(attacker, defender, attacker.moves[i]);
+        if(temp > strong){
+            strong = temp;
+            index = i;
+        }
+    }
+    return index;
+}
+
 function attack(e){
     log.innerHTML = '';
     if(ally.speed>enemy.speed){
@@ -100,7 +115,7 @@ function attack(e){
             allyHealthBar.innerHTML = statsBar(ally);
             return;
         }
-        log.innerHTML += attackFn(enemy, ally, enemy.moves[random(0,4)]);
+        log.innerHTML += attackFn(enemy, ally, enemy.moves[strongest(enemy, ally)]);
         if(ally.currentHp == 0){
             log.innerHTML += '<br>You lost';
             enemyHealthBar.innerHTML = statsBar(enemy);
@@ -108,7 +123,7 @@ function attack(e){
             return;
         }
     }else{
-        log.innerHTML += attackFn(enemy, ally, enemy.moves[random(0,4)]);
+        log.innerHTML += attackFn(enemy, ally, enemy.moves[strongest(enemy, ally)]);
         if(ally.currentHp == 0){
             log.innerHTML += '<br>You lost';
             enemyHealthBar.innerHTML = statsBar(enemy);
@@ -128,13 +143,8 @@ function attack(e){
 function attackFn(attacker, defender, move){
     if(attacker.currentHp == 0)
         return "Dead guy can't attack";
-    let damage = (100 * stab(attacker.types, move.slice(0, -1)) * effectiveness(defender.types, move.slice(0, -1)));
     let log = '';
-    if(move[move.length-1] == '0'){
-        damage = Math.round(damage*attacker.attack[0]/defender.defence[0]);
-    }else{
-        damage = Math.round(damage*attacker.attack[1]/defender.defence[1]);
-    }
+    let damage = damageDealt(attacker, defender, move);
     defender.currentHp -= damage;
     if(defender.currentHp < 0)
         defender.currentHp = 0;
@@ -149,6 +159,16 @@ function attackFn(attacker, defender, move){
         log += 'Not Very Effective. ';
     }
     return log;
+}
+
+function damageDealt(attacker, defender, move){
+    let damage = (100 * stab(attacker.types, move.slice(0, -1)) * effectiveness(defender.types, move.slice(0, -1)));
+    if(move[move.length-1] == '0'){
+        damage = Math.round(damage*attacker.attack[0]/defender.defence[0]);
+    }else{
+        damage = Math.round(damage*attacker.attack[1]/defender.defence[1]);
+    }
+    return damage;
 }
 
 function stab(allyTypes, move){
