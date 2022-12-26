@@ -69,7 +69,7 @@ function random(min, max, arr = []){
 }
 
 const enemy = new Monster();
-const ally = new Monster(localStorage.getItem('allyPower')+30);
+const ally = new Monster(localStorage.getItem('allyPower')*1+30);
 
 enemyName.textContent = enemy.name;
 allyName.textContent = ally.name;
