@@ -5,6 +5,9 @@ const allyName = document.getElementById('ally-name');
 const moves = document.getElementsByClassName('move');
 const log = document.getElementById('log');
 
+if(localStorage.getItem('allyPower') == null)
+    localStorage.setItem('allyPower', 50);
+
 const typeNames = ['Fire', 'Aqua', 'Earth', 'Nature', 'Shock'];
 const moveNames = ['Fire0', 'Aqua0', 'Earth0', 'Nature0', 'Shock0',
                    'Fire1', 'Aqua1', 'Earth1', 'Nature1', 'Shock1']
@@ -27,7 +30,7 @@ class Monster{
         this.defence = [random(average-20, average+20), random(average-20, average+20)];
         this.stamina = 100;
         this.energy = 100;
-        this.average = Math.round(((this.totalHp)/12+ this.speed + (this.attack[0]+this.attack[1])/2 + (this.defence[0]+this.defence[1])/2)/4);
+        this.average = Math.round(((this.totalHp)/9 + this.speed + (this.attack[0]+this.attack[1])/2 + (this.defence[0]+this.defence[1])/2)/4);
         this.name = this.name();
         this.moves = this.randomMoves();
     }
@@ -66,8 +69,7 @@ function random(min, max, arr = []){
 }
 
 const enemy = new Monster();
-const ally = new Monster(Math.round(localStorage.getItem('allyPower')*8/5));
-console.log(Math.round(localStorage.getItem('allyPower')*8/5));
+const ally = new Monster(localStorage.getItem('allyPower')+30);
 
 enemyName.textContent = enemy.name;
 allyName.textContent = ally.name;
