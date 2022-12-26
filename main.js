@@ -134,6 +134,19 @@ function switchFn(e){
     allyName.textContent = ally.name;
     for(let i=1; i<allyTeam.length; i++)
         team[i-1].textContent = allyTeam[i].name;
+    for(let i=0; i<4; i++){
+        moves[i].textContent = ally.moves[i];
+        moves[i].style.color = 'black';
+        moves[i].addEventListener('click', attack);
+        switch(ally.moves[i].slice(0,-1)){
+            case 'Fire': moves[i].style.backgroundColor = 'coral';break;
+            case 'Aqua': moves[i].style.backgroundColor = 'lightblue';break;
+            case 'Earth': moves[i].style.backgroundColor = 'burlywood';break;
+            case 'Nature': moves[i].style.backgroundColor = 'lightgreen';break;
+            case 'Shock': moves[i].style.backgroundColor = 'gold';break;
+        }
+    }
+    moves[strongest(ally, enemy)].style.color = 'white';
     log.innerHTML += attackFn(enemy, ally, enemyMove);
     if(ally.currentHp == 0){
         log.innerHTML += '<br>You lost';
