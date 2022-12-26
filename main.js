@@ -4,6 +4,7 @@ const enemyName = document.getElementById('enemy-name');
 const allyName = document.getElementById('ally-name');
 const moves = document.getElementsByClassName('move');
 const log = document.getElementById('log');
+const team = document.getElementsByClassName('monster');
 
 if(localStorage.getItem('allyPower') == null)
     localStorage.setItem('allyPower', 50);
@@ -68,8 +69,12 @@ function random(min, max, arr = []){
     }
 }
 
-const enemy = new Monster();
-const ally = new Monster(localStorage.getItem('allyPower')*1+30);
+const enemyTeam = [new Monster(), new Monster(), new Monster()];
+const allyTeam = [new Monster(localStorage.getItem('allyPower')*1+30),
+                  new Monster(localStorage.getItem('allyPower')*1+30),
+                  new Monster(localStorage.getItem('allyPower')*1+30),];
+let enemy = enemyTeam[0];
+let ally = allyTeam[0];
 
 enemyName.textContent = enemy.name;
 allyName.textContent = ally.name;
@@ -78,10 +83,15 @@ allyHealthBar.innerHTML = statsBar(ally);
 
 function statsBar(monster){
     return  `Stamina : ${monster.stamina}
-            <br>Energy : ${monster.energy}
-            <br>Hp:${monster.currentHp}/${monster.totalHp} Sp:${monster.speed}
-            <br>Atk:${monster.attack[0]} Sp.Atk:${monster.attack[1]}
-            <br>Df:${monster.defence[0]} Sp.Df:${monster.defence[1]}`;
+    <br>Energy : ${monster.energy}
+    <br>Hp:${monster.currentHp}/${monster.totalHp} Sp:${monster.speed}
+    <br>Atk:${monster.attack[0]} Sp.Atk:${monster.attack[1]}
+    <br>Df:${monster.defence[0]} Sp.Df:${monster.defence[1]}`;
+}
+
+for(let i=1; i<allyTeam.length; i++){
+    team[i-1].textContent = allyTeam[i].name;
+    team[i-1].addEventListener('click', switchFn);
 }
 
 for(let i=0; i<4; i++){
@@ -111,36 +121,51 @@ function strongest(attacker, defender){
     return index;
 }
 
+function switchFn(e){
+    const enemyMove = enemy.moves[strongest(enemy, ally)];
+    log.innerHTML = `You switched to ${e.path[0].textContent}.<br>`;
+    {
+        let temp = allyTeam[0];
+        allyTeam[0] = allyTeam[e.path[0].id[7]];
+        allyTeam[e.path[0].id[7]] = temp;
+    }
+    ally = allyTeam[0];
+    allyHealthBar.innerHTML = statsBar(ally);
+    allyName.textContent = ally.name;
+    for(let i=1; i<allyTeam.length; i++)
+        team[i-1].textContent = allyTeam[i].name;
+    log.innerHTML += attackFn(enemy, ally, enemyMove);
+    if(ally.currentHp == 0){
+        log.innerHTML += '<br>You lost';
+    }
+    for(let i=0; i<4; i++)
+        moves[i].style.color = 'black';
+    moves[strongest(ally, enemy)].style.color = 'white';
+    enemyHealthBar.innerHTML = statsBar(enemy);
+    allyHealthBar.innerHTML = statsBar(ally);
+}
+
 function attack(e){
     log.innerHTML = '';
     if(ally.speed>enemy.speed){
-        log.innerHTML += attackFn(ally, enemy, e.path[0].textContent);
-        log.innerHTML += '<br>'
+        log.innerHTML += `${attackFn(ally, enemy, e.path[0].textContent)}<br>`;
         if(enemy.currentHp == 0){
             log.innerHTML += 'You won';
-            enemyHealthBar.innerHTML = statsBar(enemy);
-            allyHealthBar.innerHTML = statsBar(ally);
-            return;
-        }
-        log.innerHTML += attackFn(enemy, ally, enemy.moves[strongest(enemy, ally)]);
-        if(ally.currentHp == 0){
-            log.innerHTML += '<br>You lost';
-            enemyHealthBar.innerHTML = statsBar(enemy);
-            allyHealthBar.innerHTML = statsBar(ally);
-            return;
+        }else{
+            log.innerHTML += attackFn(enemy, ally, enemy.moves[strongest(enemy, ally)]);
+            if(ally.currentHp == 0){
+                log.innerHTML += '<br>You lost';
+            }
         }
     }else{
         log.innerHTML += attackFn(enemy, ally, enemy.moves[strongest(enemy, ally)]);
         if(ally.currentHp == 0){
             log.innerHTML += '<br>You lost';
-            enemyHealthBar.innerHTML = statsBar(enemy);
-            allyHealthBar.innerHTML = statsBar(ally);
-            return;
-        }
-        log.innerHTML += '<br>'
-        log.innerHTML += attackFn(ally, enemy, e.path[0].textContent);
-        if(enemy.currentHp == 0){
-            log.innerHTML += '<br>You won';
+        }else{
+            log.innerHTML += `<br>${attackFn(ally, enemy, e.path[0].textContent)}`;
+            if(enemy.currentHp == 0){
+                log.innerHTML += '<br>You won';
+            }
         }
     }
     for(let i=0; i<4; i++)

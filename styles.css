@@ -9,6 +9,18 @@
     padding: 0%;
 }
 
+#option{
+    float: left;
+    margin: 10px;
+}
+
+#option button{
+    background-color: blueviolet;
+    color: aliceblue;
+    width: 100px;
+    height: 30px;
+}
+
 #log{
     width: 100%;
     height: 100px;
@@ -40,6 +52,18 @@
     float: left;
 }
 
+.monster{
+    float: right;
+    background-color: teal;
+    color: lavender;
+    margin: 10px;
+    border-radius: 10px;
+    width: 120px;
+    height: 30px;
+    text-align: center;
+    font-size: 15px;
+}
+
 #moveset {
     float: right;  
 }
@@ -50,13 +74,6 @@
     font-size: 25px;
     width: 150px;
     padding: 5px 0;
-}
-
-#option button{
-    background-color: blueviolet;
-    color: aliceblue;
-    width: 100px;
-    height: 30px;
 }
 
 @media only screen and (min-width: 1000px){

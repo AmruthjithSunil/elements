@@ -10,13 +10,22 @@
         <div id="game-world">
             <div id="log"></div><br>
             <div id="battle-ground">
-                <div id="enemy">
-                    <p id="enemy-name"></p>
-                    <p id="enemy-health"></p>
+                <div>
+                    <div id="option">
+                        <button onclick="location.href='options/index.html'" type="button">options</button>
+                    </div>
+                    <div id="enemy">
+                        <p id="enemy-name"></p>
+                        <p id="enemy-health"></p>
+                    </div>
                 </div>
                 <div id="ally">
                     <p id="ally-name"></p>
                     <p id="ally-health"></p>
+                </div>
+                <div id="ally-team">
+                    <button class="monster" id="monster1">hi</button>
+                    <button class="monster" id="monster2">hi</button>
                 </div>
             </div>
             <div id="moveset" >
@@ -25,9 +34,6 @@
                 <br>
                 <button class="move"></button>
                 <button class="move"></button>
-            </div>
-            <div id="option">
-                <button onclick="location.href='options/index.html'" type="button">options</button>
             </div>
         </div>
         <script src="main.js"></script>
