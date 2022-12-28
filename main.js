@@ -4,22 +4,21 @@ const enemyName = document.getElementById('enemy-name');
 const allyName = document.getElementById('ally-name');
 const moves = document.getElementsByClassName('move');
 const log = document.getElementById('log');
-const team = document.getElementsByClassName('monster');
 
 if(localStorage.getItem('allyPower') == null)
     localStorage.setItem('allyPower', 50);
+const teamSize = 3;
+for(let i=1; i<teamSize; i++){
+    const monsterButton = document.createElement('button');
+    monsterButton.id = 'monster'+i;
+    monsterButton.className = 'monster';
+    document.getElementById('ally-team').appendChild(monsterButton);
+}
+const team = document.querySelectorAll('.monster');
 
 const typeNames = ['Fire', 'Aqua', 'Earth', 'Nature', 'Shock'];
 const moveNames = ['Fire0', 'Aqua0', 'Earth0', 'Nature0', 'Shock0',
                    'Fire1', 'Aqua1', 'Earth1', 'Nature1', 'Shock1']
-
-const typeChart = [
-    [0.5, 0.5, 1.0, 2.0, 1.0],
-    [2.0, 0.5, 2.0, 0.5, 1.0],
-    [2.0, 1.0, 1.0, 0.5, 2.0],
-    [0.5, 2.0, 2.0, 0.5, 1.0],
-    [1.0, 2.0, 0.0, 0.5, 0.5]
-]
 
 class Monster{
     constructor(average = 80){
@@ -31,9 +30,16 @@ class Monster{
         this.defence = [random(average-20, average+20), random(average-20, average+20)];
         this.stamina = 100;
         this.energy = 100;
-        this.average = Math.round(((this.totalHp)/9 + this.speed + (this.attack[0]+this.attack[1])/2 + (this.defence[0]+this.defence[1])/2)/4);
+        this.average = this.average();
         this.name = this.name();
         this.moves = this.randomMoves();
+    }
+    average(){
+        let sum = this.totalHp/9;
+        sum += this.speed;
+        sum += (this.attack[0]+this.attack[1])/2;
+        sum += (this.defence[0]+this.defence[1])/2;
+        return Math.round(sum/4);
     }
     name(){
         if(this.types[0] == this.types[1])
@@ -44,7 +50,8 @@ class Monster{
         const moves = [`${this.types[0]}0`, `${this.types[0]}1`];
         if(this.types[0] != this.types[1]){
             moves.push(`${this.types[1]}${random(0,2)}`);
-            const movesIndex = [moveNames.indexOf(moves[0]), moveNames.indexOf(moves[1]), moveNames.indexOf(moves[2])];
+            const movesIndex = [moveNames.indexOf(moves[0]), moveNames.indexOf(moves[1])];
+            movesIndex.push(moveNames.indexOf(moves[2]));
             moves.push(moveNames[random(0, 10, movesIndex)]);
             return moves;
         }
@@ -54,42 +61,52 @@ class Monster{
         moves.push(moveNames[random(0, 10, movesIndex)]);        
         return moves;
     }
-}
-
-function random(min, max, arr = []){
-    let length = arr.length;
-    if(length == 0)
-        return Math.floor(Math.random()*(max-min)) + min;
-    let pass = Math.floor(Math.random()*(max-min-length));
-    for(let i=min; i<max; i++){
-        if(arr.indexOf(i) == -1)
-            pass--;
-        if(pass == -1)
-            return i;
+    statsBar(){
+        return  `Stamina : ${this.stamina}
+        <br>Energy : ${this.energy}
+        <br>Hp:${this.currentHp}/${this.totalHp} Sp:${this.speed}
+        <br>Atk:${this.attack[0]} Sp.Atk:${this.attack[1]}
+        <br>Df:${this.defence[0]} Sp.Df:${this.defence[1]}`;
+    }
+    recoverStaminaEnergy(){
+        this.stamina += 20;
+        this.energy += 20;
+        if(this.stamina > 100)
+            this.stamina = 100;
+        if(this.energy > 100)
+            this.energy = 100;
+    }
+    stab(move){
+        if(this.types[0] == this.types[1]){
+            if(this.types[0] == move)
+                return 1.5;
+            return 1;
+        }
+        if(this.types[0] == move)
+            return 1.4;
+        if(this.types[1] == move)
+            return 1.3;
+        return 1;
     }
 }
 
-const enemyTeam = [new Monster(), new Monster(), new Monster()];
-const allyTeam = [new Monster(localStorage.getItem('allyPower')*1+30),
-                  new Monster(localStorage.getItem('allyPower')*1+30),
-                  new Monster(localStorage.getItem('allyPower')*1+30),];
+const enemyTeam = [];
+const allyTeam = [];
+for(let i=0; i<teamSize; i++){
+    enemyTeam.push(new Monster());
+    allyTeam.push(new Monster(localStorage.getItem('allyPower')*1+30));
+}
+
 let enemy = enemyTeam[0];
 let ally = allyTeam[0];
 
 enemyName.textContent = enemy.name;
 allyName.textContent = ally.name;
-enemyHealthBar.innerHTML = statsBar(enemy);
-allyHealthBar.innerHTML = statsBar(ally);
+enemyHealthBar.innerHTML = enemy.statsBar();
+allyHealthBar.innerHTML = ally.statsBar();
 
-function statsBar(monster){
-    return  `Stamina : ${monster.stamina}
-    <br>Energy : ${monster.energy}
-    <br>Hp:${monster.currentHp}/${monster.totalHp} Sp:${monster.speed}
-    <br>Atk:${monster.attack[0]} Sp.Atk:${monster.attack[1]}
-    <br>Df:${monster.defence[0]} Sp.Df:${monster.defence[1]}`;
-}
 
-for(let i=1; i<allyTeam.length; i++){
+for(let i=1; i<teamSize; i++){
     team[i-1].textContent = allyTeam[i].name;
     team[i-1].addEventListener('click', switchFn);
 }
@@ -130,7 +147,7 @@ function switchFn(e){
         allyTeam[e.path[0].id[7]] = temp;
     }
     ally = allyTeam[0];
-    allyHealthBar.innerHTML = statsBar(ally);
+    allyHealthBar.innerHTML = ally.statsBar();
     allyName.textContent = ally.name;
     for(let i=1; i<allyTeam.length; i++)
         team[i-1].textContent = allyTeam[i].name;
@@ -154,8 +171,8 @@ function switchFn(e){
     for(let i=0; i<4; i++)
         moves[i].style.color = 'black';
     moves[strongest(ally, enemy)].style.color = 'white';
-    enemyHealthBar.innerHTML = statsBar(enemy);
-    allyHealthBar.innerHTML = statsBar(ally);
+    enemyHealthBar.innerHTML = enemy.statsBar();
+    allyHealthBar.innerHTML = ally.statsBar();
 }
 
 function attack(e){
@@ -184,8 +201,8 @@ function attack(e){
     for(let i=0; i<4; i++)
         moves[i].style.color = 'black';
     moves[strongest(ally, enemy)].style.color = 'white';
-    enemyHealthBar.innerHTML = statsBar(enemy);
-    allyHealthBar.innerHTML = statsBar(ally);
+    enemyHealthBar.innerHTML = enemy.statsBar();
+    allyHealthBar.innerHTML = ally.statsBar();
 }
 
 function attackFn(attacker, defender, move){
@@ -200,7 +217,7 @@ function attackFn(attacker, defender, move){
         attacker.energy = Math.round(attacker.energy/2);
     }
     defender.currentHp -= damage;
-    increment(attacker);
+    attacker.recoverStaminaEnergy();
     if(defender.currentHp < 0)
         defender.currentHp = 0;
     if(attacker === ally)
@@ -216,17 +233,8 @@ function attackFn(attacker, defender, move){
     return log;
 }
 
-function increment(attacker){
-    attacker.stamina += 20;
-    attacker.energy += 20;
-    if(attacker.stamina > 100)
-        attacker.stamina = 100;
-    if(attacker.energy > 100)
-        attacker.energy = 100;
-}
-
 function damageDealt(attacker, defender, move){
-    let damage = (100 * stab(attacker.types, move.slice(0, -1)) * effectiveness(defender.types, move.slice(0, -1)));
+    let damage = (100 * attacker.stab(move.slice(0, -1)) * effectiveness(defender.types, move.slice(0, -1)));
     if(move[move.length-1] == '0'){
         damage = Math.round(damage*attacker.attack[0]/defender.defence[0]*attacker.stamina/100);
     }else{
@@ -235,20 +243,14 @@ function damageDealt(attacker, defender, move){
     return damage;
 }
 
-function stab(allyTypes, move){
-    if(allyTypes[0] == allyTypes[1]){
-        if(allyTypes[0] == move)
-            return 1.5;
-        return 1;
-    }
-    if(allyTypes[0] == move)
-        return 1.4;
-    if(allyTypes[1] == move)
-        return 1.3;
-    return 1;
-}
-
 function effectiveness(enemyTypes, move){
+    const typeChart = [
+        [0.5, 0.5, 1.0, 2.0, 1.0],
+        [2.0, 0.5, 2.0, 0.5, 1.0],
+        [2.0, 1.0, 1.0, 0.5, 2.0],
+        [0.5, 2.0, 2.0, 0.5, 1.0],
+        [1.0, 2.0, 0.0, 0.5, 0.5]
+    ];
     let effect = typeChart[typeNames.indexOf(move)][typeNames.indexOf(enemyTypes[0])];
     if(enemyTypes[0] == enemyTypes[1]){
         return effect;
@@ -257,4 +259,17 @@ function effectiveness(enemyTypes, move){
     if(effect == 1.25)
         return 1;
     return effect;
+}
+
+function random(min, max, arr = []){
+    let length = arr.length;
+    if(length == 0)
+        return Math.floor(Math.random()*(max-min)) + min;
+    let pass = Math.floor(Math.random()*(max-min-length));
+    for(let i=min; i<max; i++){
+        if(arr.indexOf(i) == -1)
+            pass--;
+        if(pass == -1)
+            return i;
+    }
 }
