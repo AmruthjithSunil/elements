@@ -7,7 +7,9 @@ const log = document.getElementById('log');
 
 if(localStorage.getItem('allyPower') == null)
     localStorage.setItem('allyPower', 50);
-const teamSize = 3;
+if(localStorage.getItem('teamSize') == null)
+    localStorage.setItem('teamSize', 1); 
+const teamSize = localStorage.getItem('teamSize');
 for(let i=1; i<teamSize; i++){
     const monsterButton = document.createElement('button');
     monsterButton.id = 'monster'+i;
