@@ -18,12 +18,11 @@ for(let i=1; i<teamSize; i++){
 }
 const team = document.querySelectorAll('.monster');
 
-const typeNames = ['Fire', 'Aqua', 'Earth', 'Nature', 'Shock'];
-const moveNames = ['Fire0', 'Aqua0', 'Earth0', 'Nature0', 'Shock0',
-                   'Fire1', 'Aqua1', 'Earth1', 'Nature1', 'Shock1']
 
 class Monster{
     constructor(average = 80){
+        // When changing typeNames the typeIndexs in effectiveness function should be also changed
+        const typeNames = ['Fire', 'Aqua', 'Earth', 'Nature', 'Shock'];
         this.totalHp = random((average-10)*9,(average+10)*9);
         this.currentHp = this.totalHp;
         this.speed = random(average-20, average+20);
@@ -49,6 +48,8 @@ class Monster{
         return `${this.types[0]}${this.types[1]}${this.average}`;
     }
     randomMoves() {
+        const moveNames = ['Fire0', 'Aqua0', 'Earth0', 'Nature0', 'Shock0',
+                           'Fire1', 'Aqua1', 'Earth1', 'Nature1', 'Shock1'];
         const moves = [`${this.types[0]}0`, `${this.types[0]}1`];
         if(this.types[0] != this.types[1]){
             moves.push(`${this.types[1]}${random(0,2)}`);
@@ -70,7 +71,7 @@ class Monster{
         <br>Atk:${this.attack[0]} Sp.Atk:${this.attack[1]}
         <br>Df:${this.defence[0]} Sp.Df:${this.defence[1]}`;
     }
-    recoverStaminaEnergy(){
+    recoveringStaminaAndEnergy(){
         this.stamina += 20;
         this.energy += 20;
         if(this.stamina > 100)
@@ -89,6 +90,80 @@ class Monster{
         if(this.types[1] == move)
             return 1.3;
         return 1;
+    }
+    effectivenessOf(move){
+        const typeIndexs = (move) =>  {
+            switch(move){
+                case 'Fire': return 0;
+                case 'Aqua': return 1;
+                case 'Earth': return 2;
+                case 'Nature': return 3;
+                case 'Shock': return 4;
+            };
+        }
+        const typeChart = [
+            [0.5, 0.5, 1.0, 2.0, 1.0],
+            [2.0, 0.5, 2.0, 0.5, 1.0],
+            [2.0, 1.0, 1.0, 0.5, 2.0],
+            [0.5, 2.0, 2.0, 0.5, 1.0],
+            [1.0, 2.0, 0.0, 0.5, 0.5]
+        ];
+        let effect = typeChart[typeIndexs(move)][typeIndexs(this.types[0])];
+        if(this.types[0] == this.types[1]){
+            return effect;
+        }
+        effect = (effect + typeChart[typeIndexs(move)][typeIndexs(this.types[1])])/2;
+        if(effect == 1.25)
+            return 1;
+        return effect;
+    }
+    damaged(defender, move){
+        let damage = (100 * this.stab(move.slice(0, -1)) * defender.effectivenessOf(move.slice(0, -1)));
+        if(move[move.length-1] == '0'){
+            damage = Math.round(damage*this.attack[0]/defender.defence[0]*this.stamina/100);
+        }else{
+            damage = Math.round(damage*this.attack[1]/defender.defence[1]*this.energy/100);
+        }
+        return damage;
+    }
+    strongestMoveAgainst(defender){
+        let index = 0;
+        let strong = this.damaged(defender, this.moves[index]);
+        for(let i=1; i<4; i++){
+            let temp = this.damaged(defender, this.moves[i]);
+            if(temp > strong){
+                strong = temp;
+                index = i;
+            }
+        }
+        return index;
+    }
+    attacked(defender, move){
+        if(this.currentHp == 0)
+            return "Dead guy can't attack";
+        let log = '';
+        let damage = this.damaged(defender, move);
+        if(move[move.length-1] == '0'){
+            this.stamina = Math.round(this.stamina/2);
+        }
+        if(move[move.length-1] == '1'){
+            this.energy = Math.round(this.energy/2);
+        }
+        defender.currentHp -= damage;
+        this.recoveringStaminaAndEnergy();
+        if(defender.currentHp < 0)
+            defender.currentHp = 0;
+        if(this === ally)
+            log += `Your ${ally.name} used ${move}(-${damage}). `;
+        else
+            log += `Enemy ${enemy.name} used ${move}(-${damage}). `;;
+        if(defender.effectivenessOf(move.slice(0, -1))>1){
+            log += 'Super Effective. ';
+        }
+        if(defender.effectivenessOf(move.slice(0, -1))<1){
+            log += 'Not Very Effective. ';
+        }
+        return log;
     }
 }
 
@@ -125,28 +200,15 @@ for(let i=0; i<4; i++){
     }
 }
 
-moves[strongest(ally, enemy)].style.color = 'white';
-
-function strongest(attacker, defender){
-    let index = 0;
-    let strong = damageDealt(attacker, defender, attacker.moves[index]);
-    for(let i=1; i<4; i++){
-        let temp = damageDealt(attacker, defender, attacker.moves[i]);
-        if(temp > strong){
-            strong = temp;
-            index = i;
-        }
-    }
-    return index;
-}
+moves[ally.strongestMoveAgainst(enemy)].style.color = 'white';
 
 function switchFn(e){
-    const enemyMove = enemy.moves[strongest(enemy, ally)];
-    log.innerHTML = `You switched to ${e.path[0].textContent}.<br>`;
+    const enemyMove = enemy.moves[enemy.strongestMoveAgainst(ally)];
+    log.innerHTML = `You switched to ${e.composedPath()[0].textContent}.<br>`;
     {
-        let temp = allyTeam[0];
-        allyTeam[0] = allyTeam[e.path[0].id[7]];
-        allyTeam[e.path[0].id[7]] = temp;
+        const temp = allyTeam[0];
+        allyTeam[0] = allyTeam[e.composedPath()[0].id[7]];
+        allyTeam[e.composedPath()[0].id[7]] = temp;
     }
     ally = allyTeam[0];
     allyHealthBar.innerHTML = ally.statsBar();
@@ -165,14 +227,14 @@ function switchFn(e){
             case 'Shock': moves[i].style.backgroundColor = 'gold';break;
         }
     }
-    moves[strongest(ally, enemy)].style.color = 'white';
-    log.innerHTML += attackFn(enemy, ally, enemyMove);
+    moves[ally.strongestMoveAgainst(enemy)].style.color = 'white';
+    log.innerHTML += enemy.attacked(ally, enemyMove);
     if(ally.currentHp == 0){
         log.innerHTML += '<br>You lost';
     }
     for(let i=0; i<4; i++)
         moves[i].style.color = 'black';
-    moves[strongest(ally, enemy)].style.color = 'white';
+    moves[ally.strongestMoveAgainst(enemy)].style.color = 'white';
     enemyHealthBar.innerHTML = enemy.statsBar();
     allyHealthBar.innerHTML = ally.statsBar();
 }
@@ -180,21 +242,21 @@ function switchFn(e){
 function attack(e){
     log.innerHTML = '';
     if(ally.speed>enemy.speed){
-        log.innerHTML += `${attackFn(ally, enemy, e.path[0].textContent)}<br>`;
+        log.innerHTML += `${ally.attacked(enemy, e.composedPath()[0].textContent)}<br>`;
         if(enemy.currentHp == 0){
             log.innerHTML += 'You won';
         }else{
-            log.innerHTML += attackFn(enemy, ally, enemy.moves[strongest(enemy, ally)]);
+            log.innerHTML += enemy.attacked(ally, enemy.moves[enemy.strongestMoveAgainst(ally)]);
             if(ally.currentHp == 0){
                 log.innerHTML += '<br>You lost';
             }
         }
     }else{
-        log.innerHTML += attackFn(enemy, ally, enemy.moves[strongest(enemy, ally)]);
+        log.innerHTML += enemy.attacked(ally, enemy.moves[enemy.strongestMoveAgainst(ally)]);
         if(ally.currentHp == 0){
             log.innerHTML += '<br>You lost';
         }else{
-            log.innerHTML += `<br>${attackFn(ally, enemy, e.path[0].textContent)}`;
+            log.innerHTML += `<br>${ally.attacked(enemy, e.composedPath()[0].textContent)}`;
             if(enemy.currentHp == 0){
                 log.innerHTML += '<br>You won';
             }
@@ -202,65 +264,9 @@ function attack(e){
     }
     for(let i=0; i<4; i++)
         moves[i].style.color = 'black';
-    moves[strongest(ally, enemy)].style.color = 'white';
+    moves[ally.strongestMoveAgainst(enemy)].style.color = 'white';
     enemyHealthBar.innerHTML = enemy.statsBar();
     allyHealthBar.innerHTML = ally.statsBar();
-}
-
-function attackFn(attacker, defender, move){
-    if(attacker.currentHp == 0)
-        return "Dead guy can't attack";
-    let log = '';
-    let damage = damageDealt(attacker, defender, move);
-    if(move[move.length-1] == '0'){
-        attacker.stamina = Math.round(attacker.stamina/2);
-    }
-    if(move[move.length-1] == '1'){
-        attacker.energy = Math.round(attacker.energy/2);
-    }
-    defender.currentHp -= damage;
-    attacker.recoverStaminaEnergy();
-    if(defender.currentHp < 0)
-        defender.currentHp = 0;
-    if(attacker === ally)
-        log += `Your ${ally.name} used ${move}(-${damage}). `;
-    else
-        log += `Enemy ${enemy.name} used ${move}(-${damage}). `;;
-    if(effectiveness(defender.types, move.slice(0, -1))>1){
-        log += 'Super Effective. ';
-    }
-    if(effectiveness(defender.types, move.slice(0, -1))<1){
-        log += 'Not Very Effective. ';
-    }
-    return log;
-}
-
-function damageDealt(attacker, defender, move){
-    let damage = (100 * attacker.stab(move.slice(0, -1)) * effectiveness(defender.types, move.slice(0, -1)));
-    if(move[move.length-1] == '0'){
-        damage = Math.round(damage*attacker.attack[0]/defender.defence[0]*attacker.stamina/100);
-    }else{
-        damage = Math.round(damage*attacker.attack[1]/defender.defence[1]*attacker.energy/100);
-    }
-    return damage;
-}
-
-function effectiveness(enemyTypes, move){
-    const typeChart = [
-        [0.5, 0.5, 1.0, 2.0, 1.0],
-        [2.0, 0.5, 2.0, 0.5, 1.0],
-        [2.0, 1.0, 1.0, 0.5, 2.0],
-        [0.5, 2.0, 2.0, 0.5, 1.0],
-        [1.0, 2.0, 0.0, 0.5, 0.5]
-    ];
-    let effect = typeChart[typeNames.indexOf(move)][typeNames.indexOf(enemyTypes[0])];
-    if(enemyTypes[0] == enemyTypes[1]){
-        return effect;
-    }
-    effect = (effect + typeChart[typeNames.indexOf(move)][typeNames.indexOf(enemyTypes[1])])/2;
-    if(effect == 1.25)
-        return 1;
-    return effect;
 }
 
 function random(min, max, arr = []){
