@@ -1,3 +1,18 @@
+class Team{
+    constructor(size = 1, power = 80){
+        this.team = [];
+        this.left = size;
+        for(let i=0; i < size; i++)
+            this.team.push(new Monster(power));
+        this.active = this.team[0];
+    }
+    swap(a, b){
+        const temp = this.team[a];
+        this.team[a] = this.team[b];
+        this.team[b] = temp;
+    }
+}
+
 const enemyStatsBar = document.getElementById('enemy-stats');
 const allyStatsBar = document.getElementById('ally-stats');
 const enemyName = document.getElementById('enemy-name');
@@ -21,60 +36,20 @@ for(let i=1; i<teamSize; i++){
 }
 const team = document.querySelectorAll('.monster');
 
-const enemyTeam = [];
-const allyTeam = [];
-//checkout monster.js to know about monster class
-for(let i=0; i<teamSize; i++){
-    enemyTeam.push(new Monster());
-    allyTeam.push(new Monster(localStorage.getItem('allyPower')*1+30));
-}
+let enemy = new Team(teamSize);
+let ally = new Team(teamSize, localStorage.getItem('allyPower')*1+30);
 
-let enemy = enemyTeam[0];
-let ally = allyTeam[0];
+enemyName.textContent = enemy.active.name;
+allyName.textContent = ally.active.name;
+enemyStatsBar.innerHTML = enemy.active.statsBar();
+allyStatsBar.innerHTML = ally.active.statsBar();
 
-enemyName.textContent = enemy.name;
-allyName.textContent = ally.name;
-enemyStatsBar.innerHTML = enemy.statsBar();
-allyStatsBar.innerHTML = ally.statsBar();
-
-
-for(let i=1; i<teamSize; i++){
-    team[i-1].textContent = allyTeam[i].name;
-    team[i-1].addEventListener('click', swap);
-}
-
-for(let i=0; i<4; i++){
-    moves[i].textContent = ally.moves[i];
-    moves[i].addEventListener('click', attack);
-    switch(ally.moves[i].slice(0,-1)){
-        case 'Fire': moves[i].style.backgroundColor = 'coral';break;
-        case 'Aqua': moves[i].style.backgroundColor = 'lightblue';break;
-        case 'Earth': moves[i].style.backgroundColor = 'burlywood';break;
-        case 'Nature': moves[i].style.backgroundColor = 'lightgreen';break;
-        case 'Shock': moves[i].style.backgroundColor = 'gold';break;
-    }
-}
-
-moves[ally.strongestMoveAgainst(enemy)].style.color = 'white';
-
-function swap(e){
-    const enemyMove = enemy.moves[enemy.strongestMoveAgainst(ally)];
-    log.innerHTML = `You switched to ${e.composedPath()[0].textContent}.<br>`;
-    {
-        const temp = allyTeam[0];
-        allyTeam[0] = allyTeam[e.composedPath()[0].id[7]];
-        allyTeam[e.composedPath()[0].id[7]] = temp;
-    }
-    ally = allyTeam[0];
-    allyStatsBar.innerHTML = ally.statsBar();
-    allyName.textContent = ally.name;
-    for(let i=1; i<allyTeam.length; i++)
-        team[i-1].textContent = allyTeam[i].name;
+function movesetDesign(){
     for(let i=0; i<4; i++){
-        moves[i].textContent = ally.moves[i];
+        moves[i].textContent = ally.active.moves[i];
         moves[i].style.color = 'black';
         moves[i].addEventListener('click', attack);
-        switch(ally.moves[i].slice(0,-1)){
+        switch(ally.active.moves[i].slice(0,-1)){
             case 'Fire': moves[i].style.backgroundColor = 'coral';break;
             case 'Aqua': moves[i].style.backgroundColor = 'lightblue';break;
             case 'Earth': moves[i].style.backgroundColor = 'burlywood';break;
@@ -82,44 +57,61 @@ function swap(e){
             case 'Shock': moves[i].style.backgroundColor = 'gold';break;
         }
     }
-    moves[ally.strongestMoveAgainst(enemy)].style.color = 'white';
-    log.innerHTML += enemy.attacked(ally, enemyMove);
-    if(ally.currentHp == 0){
+    moves[ally.active.strongestMoveAgainst(enemy.active)].style.color = 'white';
+}
+
+for(let i=1; i<teamSize; i++){
+    team[i-1].textContent = ally.team[i].name;
+    team[i-1].addEventListener('click', swap);
+}
+
+movesetDesign();
+
+function swap(e){
+    const enemyMove = enemy.active.moves[enemy.active.strongestMoveAgainst(ally.active)];
+    log.innerHTML = `You switched to ${e.composedPath()[0].textContent}.<br>`;
+    ally.swap(0, e.composedPath()[0].id[7])
+    ally.active = ally.team[0];
+    allyStatsBar.innerHTML = ally.active.statsBar();
+    allyName.textContent = ally.active.name;
+    for(let i=1; i<ally.team.length; i++)
+        team[i-1].textContent = ally.team[i].name;
+    movesetDesign();
+    log.innerHTML += enemy.active.attacked(ally.active, enemyMove);
+    if(ally.active.currentHp == 0){
         log.innerHTML += '<br>You lost';
     }
     for(let i=0; i<4; i++)
         moves[i].style.color = 'black';
-    moves[ally.strongestMoveAgainst(enemy)].style.color = 'white';
-    enemyStatsBar.innerHTML = enemy.statsBar();
-    allyStatsBar.innerHTML = ally.statsBar();
+    moves[ally.active.strongestMoveAgainst(enemy.active)].style.color = 'white';
+    enemyStatsBar.innerHTML = enemy.active.statsBar();
+    allyStatsBar.innerHTML = ally.active.statsBar();
 }
 
 function attack(e){
-    log.innerHTML = '';
-    if(ally.speed>enemy.speed){
-        log.innerHTML += `${ally.attacked(enemy, e.composedPath()[0].textContent)}<br>`;
-        if(enemy.currentHp == 0){
+    log.innerHTML += '<br>';
+    if(ally.active.speed>enemy.active.speed){
+        log.innerHTML += `${ally.active.attacked(enemy.active, e.composedPath()[0].textContent)}<br>`;
+        if(enemy.active.currentHp == 0){
             log.innerHTML += 'You won';
         }else{
-            log.innerHTML += enemy.attacked(ally, enemy.moves[enemy.strongestMoveAgainst(ally)]);
-            if(ally.currentHp == 0){
+            log.innerHTML += enemy.active.attacked(ally.active, enemy.active.moves[enemy.active.strongestMoveAgainst(ally.active)]);
+            if(ally.active.currentHp == 0){
                 log.innerHTML += '<br>You lost';
             }
         }
     }else{
-        log.innerHTML += enemy.attacked(ally, enemy.moves[enemy.strongestMoveAgainst(ally)]);
-        if(ally.currentHp == 0){
+        log.innerHTML += enemy.active.attacked(ally.active, enemy.active.moves[enemy.active.strongestMoveAgainst(ally.active)]);
+        if(ally.active.currentHp == 0){
             log.innerHTML += '<br>You lost';
         }else{
-            log.innerHTML += `<br>${ally.attacked(enemy, e.composedPath()[0].textContent)}`;
-            if(enemy.currentHp == 0){
+            log.innerHTML += `<br>${ally.active.attacked(enemy.active, e.composedPath()[0].textContent)}`;
+            if(enemy.active.currentHp == 0){
                 log.innerHTML += '<br>You won';
             }
         }
     }
-    for(let i=0; i<4; i++)
-        moves[i].style.color = 'black';
-    moves[ally.strongestMoveAgainst(enemy)].style.color = 'white';
-    enemyStatsBar.innerHTML = enemy.statsBar();
-    allyStatsBar.innerHTML = ally.statsBar();
+    movesetDesign();
+    enemyStatsBar.innerHTML = enemy.active.statsBar();
+    allyStatsBar.innerHTML = ally.active.statsBar();
 }

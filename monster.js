@@ -1,6 +1,6 @@
 class Monster{
     constructor(average = 80){
-        // When changing typeNames the typeIndexs in effectiveness function should be also changed
+        // When changing typeNames the typeIndexs in effectiveness function should be also be changed
         const typeNames = ['Fire', 'Aqua', 'Earth', 'Nature', 'Shock'];
         this.totalHp = random((average-10)*9,(average+10)*9);
         this.currentHp = this.totalHp;
@@ -132,10 +132,10 @@ class Monster{
         this.recoveringStaminaAndEnergy();
         if(defender.currentHp < 0)
             defender.currentHp = 0;
-        if(this === ally)
-            log += `Your ${ally.name} used ${move}(-${damage}). `;
+        if(this === ally.active)
+            log += `Your ${ally.active.name} used ${move}(-${damage}). `;
         else
-            log += `Enemy ${enemy.name} used ${move}(-${damage}). `;;
+            log += `Enemy ${enemy.active.name} used ${move}(-${damage}). `;;
         if(defender.effectivenessOf(move.slice(0, -1))>1){
             log += 'Super Effective. ';
         }
