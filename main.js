@@ -1,52 +1,4 @@
-//Checkout monster.js to know more about monster class
-class Team {
-    constructor(size = 1, power = 80) {
-        this.team = [];
-        this.left = size;
-        for (let i = 0; i < size; i++)
-            this.team.push(new Monster(power));
-        this.active = this.team[0];
-    }
-    switchedTo(a) {
-        const temp = this.team[a];
-        this.team[a] = this.team[0];
-        this.team[0] = temp;
-        this.active = temp;
-    }
-}
-
-class UI {
-    constructor() {
-        this.enemyStatsBar = document.getElementById('enemy-stats');
-        this.allyStatsBar = document.getElementById('ally-stats');
-        this.enemyName = document.getElementById('enemy-name');
-        this.allyName = document.getElementById('ally-name');
-        this.moves = document.getElementsByClassName('move');
-        this.log = document.getElementById('log');
-    }
-    load(ally, enemy){
-        this.enemyName.textContent = enemy.active.name;
-        this.allyName.textContent = ally.active.name;
-        this.enemyStatsBar.innerHTML = enemy.active.statsBar();
-        this.allyStatsBar.innerHTML = ally.active.statsBar();
-    }
-    loadMoveset(ally){
-        for (let i = 0; i < 4; i++) {
-            this.moves[i].textContent = ally.active.moves[i];
-            this.moves[i].style.color = 'black';
-            this.moves[i].addEventListener('click', attack);
-            switch (ally.active.moves[i].slice(0, -1)) {
-                case 'Fire': this.moves[i].style.backgroundColor = 'coral'; break;
-                case 'Aqua': this.moves[i].style.backgroundColor = 'lightblue'; break;
-                case 'Earth': this.moves[i].style.backgroundColor = 'burlywood'; break;
-                case 'Nature': this.moves[i].style.backgroundColor = 'lightgreen'; break;
-                case 'Shock': this.moves[i].style.backgroundColor = 'gold'; break;
-            }
-        }
-        this.moves[ally.active.strongestMoveAgainst(enemy.active)].style.color = 'white';
-    }
-}
-
+//Checkout ./classes/ui.js to know more about UI class
 const ui = new UI();
 
 // Check if certain items are stored in localStorage, and if not, set them to default values
@@ -64,6 +16,7 @@ for (let i = 1; i < teamSize; i++) {
     document.getElementById('ally-team').appendChild(monsterButton);
 }
 
+//Checkout ./classes/team.js to know more about Team class
 let enemy = new Team(teamSize);
 let ally = new Team(teamSize, localStorage.getItem('allyPower') * 1 + 30);
 
